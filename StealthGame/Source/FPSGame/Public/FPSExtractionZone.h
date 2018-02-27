@@ -7,6 +7,7 @@
 #include "FPSExtractionZone.generated.h"
 
 class UBoxComponent;
+class UDecalComponent;
 
 UCLASS()
 class FPSGAME_API AFPSExtractionZone : public AActor
@@ -23,6 +24,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UBoxComponent* OverlapArea;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+	UDecalComponent* Decal;
 
 	UFUNCTION()
 	void OnAreaOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
