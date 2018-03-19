@@ -22,14 +22,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnAreaOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
+
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UBoxComponent* OverlapArea;
 
 	UPROPERTY(EditAnywhere, Category = "Components")
 	UDecalComponent* Decal;
 
-	UFUNCTION()
-	void OnAreaOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
+	UPROPERTY(EditDefaultsOnly, Category = "Audio")
+	USoundBase* ObjectiveMissingSound;
+
+	UPROPERTY(EditDefaultsOnly, Category= "Audio")
+	USoundBase* ObjectiveCompleteSound;
 
 public:	
 	
