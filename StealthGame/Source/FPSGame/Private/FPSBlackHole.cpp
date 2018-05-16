@@ -15,7 +15,6 @@ AFPSBlackHole::AFPSBlackHole()
 	HoleMesh= CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Hole"));
 	HoleMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RootComponent = HoleMesh;
-	//HoleMesh->SetupAttachment(RootComponent);
 
 	AtractorSphere= CreateDefaultSubobject<USphereComponent>(TEXT("AtractionTrigger"));
 	AtractorSphere->SetupAttachment(HoleMesh);
@@ -23,7 +22,6 @@ AFPSBlackHole::AFPSBlackHole()
 	DestructorSphere = CreateDefaultSubobject<USphereComponent>(TEXT("DestructionTrigger"));
 	DestructorSphere ->SetSphereRadius(100);
 	DestructorSphere->SetupAttachment(HoleMesh);
-	//DestructorSphere->OnComponentBeginOverlap.AddDynamic(this, &AFPSBlackHole::OnDestructionOverlap);
 }
 
 // Called when the game starts or when spawned
@@ -37,8 +35,6 @@ void AFPSBlackHole::OnDestructionOverlap(UPrimitiveComponent* HitComponent, AAct
 {
 	if (OtherActor)
 		OtherActor->Destroy();
-
-	//Destroy();
 }
 
 // Called every frame
