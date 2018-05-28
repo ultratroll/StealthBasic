@@ -4,6 +4,7 @@
 #include "FPSHUD.h"
 #include "FPSCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
 
 AFPSGameMode::AFPSGameMode()
 {
@@ -20,6 +21,21 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn)
 	if (InstigatorPawn)
 	{
 		InstigatorPawn->DisableInput(nullptr);
+
+		if (ViewSpectatorPointClass)
+		{
+			TArray<AActor*> ViewPointActors;
+			UGameplayStatics::GetAllActorsOfClass(this, ViewSpectatorPointClass, ViewPointActors);
+
+			if (ViewPointActors.Num() > 0)
+			{
+				if (APlayerController* PlayerController = Cast<APlayerController>(InstigatorPawn->GetController()))
+				{
+					AActor* NewViewTarget = ViewPointActors[0];
+					PlayerController->SetViewTargetWithBlend(NewViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+				}
+			}
+		}
 	}
 
 	OnMissionCompleted(InstigatorPawn);

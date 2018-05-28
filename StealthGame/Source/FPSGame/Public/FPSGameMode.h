@@ -20,6 +20,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category= "Mission")
 	void OnMissionCompleted(APawn* InstigatorPawn);
 
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category= "Spectate")
+	TSubclassOf<AActor> ViewSpectatorPointClass;
+
 };
 
 
