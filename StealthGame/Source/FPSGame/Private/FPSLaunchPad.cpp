@@ -57,9 +57,3 @@ void AFPSLaunchPad::OnLaunchPadOverlap(UPrimitiveComponent* HitComponent, AActor
 	}
 }
 
-// Called every frame
-void AFPSLaunchPad::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-

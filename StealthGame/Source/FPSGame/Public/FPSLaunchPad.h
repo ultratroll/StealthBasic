@@ -47,8 +47,4 @@ protected:
 
 	UFUNCTION()
 	void OnLaunchPadOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };
