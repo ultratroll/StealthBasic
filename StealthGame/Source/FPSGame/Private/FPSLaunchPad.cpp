@@ -13,18 +13,16 @@ AFPSLaunchPad::AFPSLaunchPad()
 
 	//UStaticMeshComponent*	RootComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Root"));
 
+	LaunchPadBox = CreateDefaultSubobject<UBoxComponent>(TEXT("LaunchPadTrigger"));
+	LaunchPadBox->SetBoxExtent(FVector(85, 85, 40));
+	RootComponent = LaunchPadBox;
+
 	LaunchPadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("LaunchPad"));
 	LaunchPadMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	RootComponent = LaunchPadMesh;
 
+	LaunchPadMesh->SetupAttachment(LaunchPadBox);
 
-	LaunchPadBox = CreateDefaultSubobject<UBoxComponent>(TEXT("LaunchPadTrigger"));
-	LaunchPadBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	LaunchPadBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	LaunchPadBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	LaunchPadBox->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	LaunchPadBox->SetBoxExtent(FVector(200.0f));
-	LaunchPadBox->SetupAttachment(LaunchPadMesh);
+	bUsePushAngle = true;
 }
 
 // Called when the game starts or when spawned
@@ -40,15 +38,21 @@ void AFPSLaunchPad::OnLaunchPadOverlap(UPrimitiveComponent* HitComponent, AActor
 {
 	AFPSCharacter* Character = Cast<AFPSCharacter>(OtherActor);
 
+	FRotator Rotation = this->GetActorRotation();
+	Rotation.Pitch += LaunchPitchAngle;
+	const FVector Push = Rotation.Vector() * PushForce;
+
 	if (Character)
 	{
-		Character->LaunchCharacter(PushDirection*PushForce, true, true);
+		Character->LaunchCharacter(Push, true, true);
+		//	Character->LaunchCharacter(PushDirection*PushForce, true, true);
 	}
 	else
 	{
-		if (OtherComponent)
+		if (OtherComponent && OtherComponent->IsSimulatingPhysics())
 		{
-			OtherComponent->AddForce(PushDirection*PushForce);
+			OtherComponent->AddImpulse(Push, NAME_None, true);
+			UE_LOG(LogTemp, Log, TEXT("PUSH!"));
 		}
 	}
 }

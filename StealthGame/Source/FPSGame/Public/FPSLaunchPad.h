@@ -29,11 +29,21 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Pad")
 	UBoxComponent* LaunchPadBox;
 
+	/** Force of push. */
 	UPROPERTY(EditAnywhere, Category = "Pad")
 	float PushForce= 7000.0f;
 
+	/** Angle to push if bUsePushAngle is set to true. */
+	UPROPERTY(EditAnywhere, Category = "Pad")
+	float LaunchPitchAngle= 35.0f;
+
+	/** Used to define direction instead of angle when the bUsePushAngle flag is off. */
 	UPROPERTY(EditAnywhere, Category = "Pad")
 	FVector PushDirection;
+
+	/** If true, push using the angle instead of the direction. */
+	UPROPERTY(EditAnywhere, Category = "Pad")
+	uint8 bUsePushAngle : 1;
 
 	UFUNCTION()
 	void OnLaunchPadOverlap(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit);
@@ -41,7 +51,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	
-	
 };
