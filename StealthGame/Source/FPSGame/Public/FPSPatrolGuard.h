@@ -31,6 +31,16 @@ protected:
 	UFUNCTION(Category = "AI")
 	void OnSeenPawn(APawn* PawnSeen);
 
+
+	/**
+	*	To be called when a pawn is heard
+	*	@param Instigator Pawn making noise
+	*	@param Location of the noise
+	*	@param Volume of the noise
+	*/
+	UFUNCTION(Category = "AI")
+	void OnNoiseHeard(APawn* NoiseInstigator, const FVector& Location, float Volume);
+
 public:	
 	
 	virtual void Tick(float DeltaTime) override;	
