@@ -2,27 +2,36 @@
 
 #include "FPSPatrolGuard.h"
 #include "Perception/PawnSensingComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AFPSPatrolGuard::AFPSPatrolGuard()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
+
+	PawnSensingComponent->OnSeePawn.AddDynamic(this, &AFPSPatrolGuard::OnSeenPawn);
 }
 
-// Called when the game starts or when spawned
 void AFPSPatrolGuard::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
+void AFPSPatrolGuard::OnSeenPawn(APawn* PawnSeen)
+{
+	if (!IsValid(PawnSeen))
+		return;
+
+	DrawDebugLine(GetWorld(), this->GetActorLocation(), PawnSeen->GetActorLocation(), FColor::Red, false, 0.5f);
+
+	DrawDebugSphere(GetWorld(), PawnSeen->GetActorLocation(), 32, 12, FColor::Orange, false, 5.0f);
+}
+
 void AFPSPatrolGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
-

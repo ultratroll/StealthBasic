@@ -24,7 +24,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComponent;
 
+	/** 
+	*	To be called when a pawn is seen 
+	*	@param PawnSeen Pawn being seen
+	*/
+	UFUNCTION(Category = "AI")
+	void OnSeenPawn(APawn* PawnSeen);
+
 public:	
-	// Called every frame
+	
 	virtual void Tick(float DeltaTime) override;	
 };
