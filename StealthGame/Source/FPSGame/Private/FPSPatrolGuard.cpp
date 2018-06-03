@@ -18,6 +18,7 @@ void AFPSPatrolGuard::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	OriginalRotation = GetActorRotation();
 }
 
 void AFPSPatrolGuard::OnSeenPawn(APawn* PawnSeen)
@@ -34,6 +35,24 @@ void AFPSPatrolGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector & Loca
 {
 	DrawDebugLine(GetWorld(), this->GetActorLocation(), Location, FColor::Blue, false, 0.5f);
 	DrawDebugSphere(GetWorld(), Location, 32, 12, FColor::Blue, false, 5.0f);
+
+	FVector DirectionOfNoise = Location - this->GetActorLocation();
+	DirectionOfNoise.Normalize();
+
+	FRotator LookAt= FRotationMatrix::MakeFromX(DirectionOfNoise).Rotator();
+
+	LookAt.Pitch = 0.0f;
+	LookAt.Roll = 0.0f;
+
+	SetActorRotation(LookAt);
+
+	GetWorldTimerManager().ClearTimer(TimerReturnRotation);
+	GetWorldTimerManager().SetTimer(TimerReturnRotation, this, &AFPSPatrolGuard::ResetOrientation, 3.0f);
+}
+
+void AFPSPatrolGuard::ResetOrientation()
+{
+	SetActorRotation(OriginalRotation);
 }
 
 void AFPSPatrolGuard::Tick(float DeltaTime)
