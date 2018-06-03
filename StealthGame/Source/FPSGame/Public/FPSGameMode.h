@@ -15,10 +15,20 @@ public:
 
 	AFPSGameMode();
 
-	void CompleteMission(APawn* InstigatorPawn);
+	/**
+	*	On mission complete, disables input in the pawn, moves the camera to a special blueprint that serves as refrence. 
+	*	@param InstigatorPawn	The pawn that completed the mission
+	*	@param bMissionSuccess	The mission was a success or not
+	*/
+	void CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess);
 
+	/** 
+	*	On mission complete, the blueprint implementation shows the widget and does something else...
+	*	@param InstigatorPawn	The pawn that completed the mission
+	*	@param bMissionSuccess	The mission was a success or not
+	*/
 	UFUNCTION(BlueprintImplementableEvent, Category= "Mission")
-	void OnMissionCompleted(APawn* InstigatorPawn);
+	void OnMissionCompleted(APawn* InstigatorPawn, bool bMissionSuccess);
 
 protected:
 
