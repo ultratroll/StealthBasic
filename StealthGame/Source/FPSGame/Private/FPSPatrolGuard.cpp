@@ -14,6 +14,8 @@ AFPSPatrolGuard::AFPSPatrolGuard()
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComponent"));
 	PawnSensingComponent->OnSeePawn.AddDynamic(this, &AFPSPatrolGuard::OnSeenPawn);
 	PawnSensingComponent->OnHearNoise.AddDynamic(this, &AFPSPatrolGuard::OnNoiseHeard);
+
+	GuardState = EGUARD_AI_STATE::Idle;
 }
 
 void AFPSPatrolGuard::BeginPlay()
@@ -36,12 +38,16 @@ void AFPSPatrolGuard::OnSeenPawn(APawn* PawnSeen)
 	AFPSGameMode* GameMode = Cast<AFPSGameMode>(GetWorld()->GetAuthGameMode());
 	if (GameMode)
 	{
+		SetGuardState(EGUARD_AI_STATE::Alerted);
 		GameMode->CompleteMission(PawnSeen, false);
 	}
 }
 
 void AFPSPatrolGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector & Location, float Volume)
 {
+	if (GuardState == EGUARD_AI_STATE::Alerted)
+		return;
+
 	DrawDebugLine(GetWorld(), this->GetActorLocation(), Location, FColor::Blue, false, 0.5f);
 	DrawDebugSphere(GetWorld(), Location, 32, 12, FColor::Blue, false, 5.0f);
 
@@ -57,15 +63,29 @@ void AFPSPatrolGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector & Loca
 
 	GetWorldTimerManager().ClearTimer(TimerReturnRotation);
 	GetWorldTimerManager().SetTimer(TimerReturnRotation, this, &AFPSPatrolGuard::ResetOrientation, 3.0f);
+
+	SetGuardState(EGUARD_AI_STATE::Suspicious);
 }
 
 void AFPSPatrolGuard::ResetOrientation()
 {
 	SetActorRotation(OriginalRotation);
+
+	SetGuardState(EGUARD_AI_STATE::Idle);
 }
 
 void AFPSPatrolGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AFPSPatrolGuard::SetGuardState(const EGUARD_AI_STATE & NewGuardState)
+{
+	if (NewGuardState == GuardState)
+		return;
+
+	GuardState = NewGuardState;
+
+	OnGuardStateChanged(NewGuardState);
 }

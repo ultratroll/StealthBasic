@@ -8,6 +8,15 @@
 
 class UPawnSensingComponent;
 
+UENUM(BlueprintType)
+enum class EGUARD_AI_STATE : uint8
+{
+	Idle,
+	Suspicious,
+	Alerted
+};
+
+
 UCLASS()
 class FPSGAME_API AFPSPatrolGuard : public ACharacter
 {
@@ -17,14 +26,31 @@ public:
 	// Sets default values for this character's properties
 	AFPSPatrolGuard();
 
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = AI)
+	void SetGuardState(const EGUARD_AI_STATE &NewGuardState);
+
+	UFUNCTION(BlueprintCallable, Category = AI)
+	const EGUARD_AI_STATE &GetGuardState() { return GuardState; }
+
+	UFUNCTION(BlueprintImplementableEvent, Category = AI)
+	void OnGuardStateChanged(const EGUARD_AI_STATE &NewGuardState);
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComponent;
 
+	UPROPERTY(Transient)
 	FRotator OriginalRotation;
 
+	UPROPERTY(Transient)
 	FTimerHandle TimerReturnRotation;
+
+	/** Current state of the guard. */
+	UPROPERTY(Transient)
+	EGUARD_AI_STATE GuardState;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -50,7 +76,4 @@ protected:
 	UFUNCTION(Category = "AI")
 	void ResetOrientation();
 
-public:	
-	
-	virtual void Tick(float DeltaTime) override;	
 };
