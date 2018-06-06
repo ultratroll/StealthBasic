@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "FPSGameMode.h"
 #include "Kismet/GameplayStatics.h"
+#include "AI/Navigation/NavigationSystem.h"
 
 // Sets default values
 AFPSPatrolGuard::AFPSPatrolGuard()
@@ -23,6 +24,9 @@ void AFPSPatrolGuard::BeginPlay()
 	Super::BeginPlay();
 	
 	OriginalRotation = GetActorRotation();
+
+	if (bPatrol)
+		MoveNextPatrolPoint();
 }
 
 void AFPSPatrolGuard::OnSeenPawn(APawn* PawnSeen)
@@ -40,6 +44,12 @@ void AFPSPatrolGuard::OnSeenPawn(APawn* PawnSeen)
 	{
 		SetGuardState(EGUARD_AI_STATE::Alerted);
 		GameMode->CompleteMission(PawnSeen, false);
+		
+		if (AController* Controller = GetController())
+		{
+			Controller->StopMovement();
+		}
+
 	}
 }
 
@@ -65,6 +75,11 @@ void AFPSPatrolGuard::OnNoiseHeard(APawn * NoiseInstigator, const FVector & Loca
 	GetWorldTimerManager().SetTimer(TimerReturnRotation, this, &AFPSPatrolGuard::ResetOrientation, 3.0f);
 
 	SetGuardState(EGUARD_AI_STATE::Suspicious);
+
+	if (AController* Controller = GetController())
+	{
+		Controller->StopMovement();
+	}
 }
 
 void AFPSPatrolGuard::ResetOrientation()
@@ -72,12 +87,51 @@ void AFPSPatrolGuard::ResetOrientation()
 	SetActorRotation(OriginalRotation);
 
 	SetGuardState(EGUARD_AI_STATE::Idle);
+
+	MoveNextPatrolPoint();
+}
+
+void AFPSPatrolGuard::MoveNextPatrolPoint()
+{
+	if (bPatrol)
+	{
+		if (!IsValid(CurrentPatrolPoint))
+		{
+			if (PatrolPoints.Num() > 0)
+			{
+				CurrentPatrolPoint = PatrolPoints[0];
+			}
+			else
+			{
+				bPatrol= false;
+			}
+		}
+		else
+		{
+			CurrentPatrolPointIdx++;
+			if (PatrolPoints.Num() < CurrentPatrolPointIdx)
+				CurrentPatrolPointIdx = 0;
+
+			CurrentPatrolPoint = PatrolPoints[CurrentPatrolPointIdx];
+		}
+		
+		UNavigationSystem::SimpleMoveToActor(GetController(), CurrentPatrolPoint);
+	}
 }
 
 void AFPSPatrolGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsValid(CurrentPatrolPoint) && bPatrol)
+	{
+		const float Distance = (CurrentPatrolPoint->GetActorLocation() - this->GetActorLocation()).Size();
+
+		if (Distance < MinimalDistance)
+		{
+			MoveNextPatrolPoint();
+		}
+	}
 }
 
 void AFPSPatrolGuard::SetGuardState(const EGUARD_AI_STATE & NewGuardState)

@@ -39,6 +39,21 @@ public:
 
 protected:
 
+	UPROPERTY(EditInstanceOnly, Category= "AI")
+	uint8 bPatrol: 1;
+
+	UPROPERTY(Transient)
+	uint8 CurrentPatrolPointIdx : 1;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI")
+	float MinimalDistance = 100.0f;
+
+	UPROPERTY(EditInstanceOnly, Category = "AI", meta = (EditCondition="bPatrol"))
+	TArray <AActor*> PatrolPoints;
+
+	UPROPERTY(Transient)
+	AActor* CurrentPatrolPoint;
+
 	UPROPERTY(VisibleAnywhere, Category = "AI")
 	UPawnSensingComponent* PawnSensingComponent;
 
@@ -75,5 +90,9 @@ protected:
 	/** Restores the guards orientation to its original one. */
 	UFUNCTION(Category = "AI")
 	void ResetOrientation();
+
+	/** Moves to the next patrol point. */
+	UFUNCTION(Category = "AI")
+	void MoveNextPatrolPoint();
 
 };
