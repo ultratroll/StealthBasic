@@ -31,6 +31,20 @@ AFPSCharacter::AFPSCharacter()
 	NoiseEmitterComponent = CreateDefaultSubobject<UPawnNoiseEmitterComponent>(TEXT("NoiseEmitterComponent"));
 }
 
+void AFPSCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Only if its a replicated, we want update where the pawn is looking, because unlike rotation and position it doesnt update by itself. 
+	// Locally controlled pawns rotation controlled by input as usual 
+	if (!IsLocallyControlled())
+	{
+		FRotator NewRotation = CameraComponent->RelativeRotation;
+		NewRotation.Pitch = RemoteViewPitch * 360.0f /255.0f; // Uncompress the pitch (in engine its stored with the inverse of this operation)
+		CameraComponent->SetRelativeRotation(NewRotation);
+	}
+}
+
 
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

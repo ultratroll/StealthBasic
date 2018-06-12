@@ -40,6 +40,8 @@ protected:
 public:
 	AFPSCharacter();
 
+	void Tick(float DeltaTime) override;
+
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TSubclassOf<AFPSProjectile> ProjectileClass;
