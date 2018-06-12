@@ -6,6 +6,7 @@
 #include "FPSGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AFPSPatrolGuard::AFPSPatrolGuard()
@@ -17,6 +18,11 @@ AFPSPatrolGuard::AFPSPatrolGuard()
 	PawnSensingComponent->OnHearNoise.AddDynamic(this, &AFPSPatrolGuard::OnNoiseHeard);
 
 	GuardState = EGUARD_AI_STATE::Idle;
+}
+
+void AFPSPatrolGuard::OnRep_GuardState()
+{
+	OnGuardStateChanged(GuardState); // LEts change the UI reaction in blueprint
 }
 
 void AFPSPatrolGuard::BeginPlay()
@@ -139,7 +145,16 @@ void AFPSPatrolGuard::SetGuardState(const EGUARD_AI_STATE & NewGuardState)
 	if (NewGuardState == GuardState)
 		return;
 
-	GuardState = NewGuardState;
+	GuardState = NewGuardState; // This is done in server only (called from AI methods) and will trigger OnRep_GuardState calls on all clients (not server).
 
-	OnGuardStateChanged(NewGuardState);
+	OnRep_GuardState(); // Since OnRep_GuardState is only called in clients, and SetGuardState only called from AI methods (that only work in server), we call this here
+	// so that reactions UI on dwarf guards also happen in server
+}
+
+/** Setting the rules of how variables are going to be replicated (one client?, multiple clients?, ect). */
+void AFPSPatrolGuard::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFPSPatrolGuard, GuardState);
 }
