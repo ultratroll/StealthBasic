@@ -64,8 +64,12 @@ protected:
 	FTimerHandle TimerReturnRotation;
 
 	/** Current state of the guard. */
-	UPROPERTY(Transient)
+	UPROPERTY(Transient, ReplicatedUsing= OnRep_GuardState)
 	EGUARD_AI_STATE GuardState;
+
+	/** Will be called by itself only in the clients when variable changes. Wont call by itself in the server */
+	UFUNCTION()
+	void OnRep_GuardState();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -76,7 +80,6 @@ protected:
 	*/
 	UFUNCTION(Category = "AI")
 	void OnSeenPawn(APawn* PawnSeen);
-
 
 	/**
 	*	To be called when a pawn is heard
