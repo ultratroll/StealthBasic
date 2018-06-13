@@ -19,6 +19,8 @@ AFPSObjectiveActor::AFPSObjectiveActor()
 	SphereComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 	
 	SphereComponent->SetupAttachment(RootComponent);
+
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -36,14 +38,16 @@ void AFPSObjectiveActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor); 
 
-	AFPSCharacter* MyCharacter = Cast<AFPSCharacter>(OtherActor);
-
-	if (MyCharacter)
-	{
-		MyCharacter->bIsCarryingObjective = true;
-		Destroy();
-	}
-
 	PlayEffects();
+
+	if (Role == ROLE_Authority) // The method runs in client and server, but this portion only runs in the server
+	{
+		AFPSCharacter* MyCharacter = Cast<AFPSCharacter>(OtherActor);
+		if (MyCharacter)
+		{
+			MyCharacter->bIsCarryingObjective = true;
+			Destroy();
+		}
+	}
 }
 
