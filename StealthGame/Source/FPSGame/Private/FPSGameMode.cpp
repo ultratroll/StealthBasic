@@ -23,8 +23,6 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 {
 	if (InstigatorPawn)
 	{
-		//InstigatorPawn->DisableInput(nullptr);  // We want this to happen on all clients, will pass it to gamemode	
-
 		if (ViewSpectatorPointClass)
 		{
 			TArray<AActor*> ViewPointActors;
@@ -32,10 +30,16 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 
 			if (ViewPointActors.Num() > 0)
 			{
-				if (APlayerController* PlayerController = Cast<APlayerController>(InstigatorPawn->GetController()))
+				AActor* NewViewTarget = ViewPointActors[0];
+
+				for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; Iterator++)
 				{
-					AActor* NewViewTarget = ViewPointActors[0];
-					PlayerController->SetViewTargetWithBlend(NewViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
+					APlayerController* PlayerController = Iterator->Get();
+
+					if (PlayerController) // This is called in the server (gamemode only exist in the server), no need to check if its locally
+					{
+						PlayerController->SetViewTargetWithBlend(NewViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic); // SetViewTargetWithBlend replicates, so when the GM calls it in all player controllers, it actually gets called on all machines
+					}
 				}
 			}
 		}
@@ -46,7 +50,5 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 	{
 		GameState->MulticastOnMissionCompleted(InstigatorPawn, bMissionSuccess);
 	}
-
-	//OnMissionCompleted(InstigatorPawn, bMissionSuccess); // We want this to happen on all clients
 }
 
