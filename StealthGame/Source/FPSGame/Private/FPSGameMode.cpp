@@ -47,6 +47,6 @@ void AFPSGameMode::CompleteMission(APawn* InstigatorPawn, bool bMissionSuccess)
 		GameState->MulticastOnMissionCompleted(InstigatorPawn, bMissionSuccess);
 	}
 
-	OnMissionCompleted(InstigatorPawn, bMissionSuccess); // We want this to happen on all clients
+	//OnMissionCompleted(InstigatorPawn, bMissionSuccess); // We want this to happen on all clients
 }
 
